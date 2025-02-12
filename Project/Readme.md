@@ -55,7 +55,7 @@ time python defusion_train.py
 ## 5. Inception Scores for Real and Generated Images
 - The results are stored in the **`evaluation_results_IS/`** directory.
 - The Inceptions Scores(IS) are the evaluation metric for the quality of the generated images because higher IS indicates that the classification are more confident and the image dataset is diverse. 
-- We compare the IS of the generated images and real images. We aim to generate images such that the IS is similar to the real images.
+- We compare the IS of the generated images and real images. We aim to generate images such that the IS of the generated and real images are similar.
 - The evaluate_IS.py computes inception scores(IS) for both real and generated images for each category, given that the base directories are set correctly in the code. (We could not upload datasets on Github because the size was too big.)
 
 ```
