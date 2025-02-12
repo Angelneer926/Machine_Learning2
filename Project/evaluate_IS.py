@@ -58,32 +58,32 @@ def get_image_paths(directory):
     return paths
 
 
-def evaluate_category(cat, orig_dir, gen_dir):
+def evaluate(cat, orig_dir, gen_dir):
     real_dir = os.path.join(orig_dir, cat)
     real_paths = get_image_paths(real_dir)
     real_preds = get_predictions(real_paths)
     real_is = calculate_inception_score(real_preds)
 
-    # modify to take multiple images in the path
-    gen_path = os.path.join(gen_dir, f'{cat}_generated.png') # change to the directory that contains images for this category 'cat'
-    # add gen_paths = get_image_paths(gen_path)
-    gen_preds = get_predictions([gen_path])
+    gen_path = os.path.join(gen_dir, cat)
+    gen_paths = get_image_paths(gen_path)
+    gen_preds = get_predictions(gen_paths)
     gen_is = calculate_inception_score(gen_preds)
 
     return real_is, gen_is
 
 def main():
-    categories = ["EC", "CC", "HGSC", "MC"]
+    categories = ["CC","EC","HGSC","LGSC","MC"]
     orig_dir = 'patch_class'
     gen_dir = 'generated_images'
     results = {}
 
     for c in categories:
         print(f"\nEvaluating IS for: {c}")
-        real_is, gen_is = evaluate_category(c, orig_dir, gen_dir)
+        real_is, gen_is = evaluate(c, orig_dir, gen_dir)
         results[c] = {'real': real_is, 'generated': gen_is}
+        print(f"Category: {c}")
         print(f"  Real images Inception Score: {real_is}")
-        print(f"  Generated image Inception Score: {gen_is}")
+        print(f"  Generated images Inception Score: {gen_is}")
 
     real_scores = [v['real'] for v in results.values() if v['real'] is not None]
     gen_scores = [v['generated'] for v in results.values() if v['generated'] is not None]
@@ -95,3 +95,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
