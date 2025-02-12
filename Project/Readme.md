@@ -46,13 +46,8 @@ time python defusion_train.py
 - Due to time constraints, the current training step count is set to **10,000** (`train_num_steps=10000`).
 - In future experiments, this may be increased to **500,000** to improve generation quality.
 
----
 
-## 4. Model and Output Storage
-- The **`results/`** directory contains trained **DDPM models** for each subtype.
-- The **`generated_images/`** directory stores the **generated images** for each subtype.
-
-## 5. Inception Scores for Real and Generated Images
+## 4. Inception Scores for Real and Generated Images
 - The results are stored in the **`evaluation_results_IS/`** directory.
 - The Inceptions Scores(IS) are the evaluation metric for the quality of the generated images because higher IS indicates that the classification are more confident and the image dataset is diverse. 
 - We compare the IS of the generated images and real images. We aim to generate images such that the IS of the generated and real images are similar.
@@ -62,6 +57,10 @@ time python defusion_train.py
 ```
 python evaluate_IS.py
 ```
+---
+## 5. Model and Output Storage
+- The **`results/`** directory contains trained **DDPM models** for each subtype.
+- The **`generated_images/`** directory stores the **generated images** for each subtype.
 
 ```bash
 results/            # Directory containing trained DDPM models
