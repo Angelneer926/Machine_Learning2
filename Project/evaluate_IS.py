@@ -73,7 +73,7 @@ def evaluate_category(cat, orig_dir, gen_dir):
     return real_is, gen_is
 
 def main():
-    categories = ["EC", "CC", "HGSC", "MC"]
+    categories = ["HGSC", "CC", "MC"]
     orig_dir = 'patch_class'
     gen_dir = 'generated_images'
     results = {}
