@@ -9,100 +9,89 @@ if gpus:
     try:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
-        print("Using GPU for inference.")
+        print("Using GPU")
     except RuntimeError as e:
         print(e)
 else:
-    print("GPU not available; using CPU.")
+    print("using CPU")
 
-# Load the InceptionV3 model (pretrained on ImageNet) in inference mode.
 model = InceptionV3(weights='imagenet')
 model.trainable = False
 
-def load_and_preprocess_image(image_path):
-    img = Image.open(image_path).convert('RGB')
-    img = img.resize((299,299))
-    img_array = np.array(img)
-    # Expand dims to get shape (1, height, width, channels)
-    img_array = np.expand_dims(img_array, axis=0)
-    # Preprocess the image (scaling pixel values etc.)
-    img_array = preprocess_input(img_array)
-    return img_array
+def load_image(path):
+    img = Image.open(path).convert('RGB')
+    img = img.resize((299, 299))
+    arr = np.array(img)
+    arr = np.expand_dims(arr, axis=0)
+    return preprocess_input(arr)
 
 def get_predictions(image_paths, batch_size=32):
-    predictions = []
-    n = len(image_paths)
-    for i in range(0, n, batch_size):
+    if not image_paths:
+        return np.array([])
+    preds_list = []
+    for i in range(0, len(image_paths), batch_size):
         batch_paths = image_paths[i:i+batch_size]
-        batch_images = []
-        for path in batch_paths:
-            img_array = load_and_preprocess_image(path)
-            batch_images.append(img_array)
-        # Stack the batches
+        batch_images = [load_image(p) for p in batch_paths]
         batch_images = np.vstack(batch_images)
         preds = model.predict(batch_images)
-        predictions.append(preds)
-    predictions = np.vstack(predictions)
-    return predictions
+        preds_list.append(preds)
+    return np.vstack(preds_list) if preds_list else np.array([])
 
-def calculate_inception_score(predictions, eps=1e-16):
-    py = np.mean(predictions, axis=0, keepdims=True) 
-    KL = predictions * (np.log(predictions + eps) - np.log(py + eps))
-    kL = np.sum(KL, axis=1)
-    mean_KL = np.mean(KL)
-    return np.exp(mean_KL)
+def calculate_inception_score(preds, eps=1e-16):
+    if preds.size == 0:
+        return None
+    if preds.ndim == 1:
+        preds = preds[np.newaxis, :]
+    py = np.mean(preds, axis=0, keepdims=True)
+    kl = preds * (np.log(preds + eps) - np.log(py + eps))
+    kl_mean = np.mean(np.sum(kl, axis=1))
+    return np.exp(kl_mean)
 
-def get_image_paths(directory, extensions={'.png', '.jpg', '.jpeg', '.bmp'}):
-    image_paths = []
+def get_image_paths(directory):
+    paths = []
     if not os.path.isdir(directory):
-        print(f"Directory not found: {directory}")
-        return image_paths
+        print(f"NOT FOUND: {directory}")
+        return paths
     for fname in os.listdir(directory):
-        if any(fname.lower().endswith(ext) for ext in extensions):
-            image_paths.append(os.path.join(directory, fname))
-    return image_paths
+        if fname.lower().endswith('.png'):
+            paths.append(os.path.join(directory, fname))
+    return paths
 
-def evaluate_category(category, original_base_dir, generated_base_dir):
-    # Evaluate real images
-    real_dir = os.path.join(original_base_dir, category)
-    real_image_paths = get_image_paths(real_dir)
-    real_preds = get_predictions(real_image_paths)
-    real_inception_score = calculate_inception_score(real_preds)
-    
-    # Evaluate the generated image
-    gen_image_path = os.path.join(generated_base_dir, f'{category}_generated.png')
-    gen_preds = get_predictions([gen_image_path])
-    gen_inception_score = calculate_inception_score(gen_preds)
-    
-    return real_inception_score, gen_inception_score
+
+def evaluate_category(cat, orig_dir, gen_dir):
+    real_dir = os.path.join(orig_dir, cat)
+    real_paths = get_image_paths(real_dir)
+    real_preds = get_predictions(real_paths)
+    real_is = calculate_inception_score(real_preds)
+
+    # modify to take multiple images in the path
+    gen_path = os.path.join(gen_dir, f'{cat}_generated.png') # change to the directory that contains images for this category 'cat'
+    # add gen_paths = get_image_paths(gen_path)
+    gen_preds = get_predictions([gen_path])
+    gen_is = calculate_inception_score(gen_preds)
+
+    return real_is, gen_is
 
 def main():
-    # Define categories
-    categories = ["CC", "EC", "HGSC", "LGSC", "MC"]
-    original_base_dir = 'patch_class'
-    generated_base_dir = 'generated_images'
-    
+    categories = ["EC", "CC", "HGSC", "MC"]
+    orig_dir = 'patch_class'
+    gen_dir = 'generated_images'
     results = {}
-    for category in categories:
-        print(f"\nEvaluating category: {category}")
-        real_is, gen_is = evaluate_category(category, original_base_dir, generated_base_dir)
-        results[category] = {
-            'real_inception_score': real_is,
-            'generated_inception_score': gen_is
-        }
-        print(f"Category: {category}")
-        print(f"  Average Inception Score for real images: {real_is}")
-        print(f"  Inception Score for generated image: {gen_is}")
+
+    for c in categories:
+        print(f"\nEvaluating IS for: {c}")
+        real_is, gen_is = evaluate_category(c, orig_dir, gen_dir)
+        results[c] = {'real': real_is, 'generated': gen_is}
+        print(f"  Real images Inception Score: {real_is}")
+        print(f"  Generated image Inception Score: {gen_is}")
+
+    real_scores = [v['real'] for v in results.values() if v['real'] is not None]
+    gen_scores = [v['generated'] for v in results.values() if v['generated'] is not None]
     
-    # compute overall averages
-    real_scores = [r['real_inception_score'] for r in results.values() if r['real_inception_score'] is not None]
-    gen_scores = [r['generated_inception_score'] for r in results.values() if r['generated_inception_score'] is not None]
     if real_scores:
-        overall_real_avg = np.mean(real_scores)
-        print(f"\nOverall average Inception Score for real images: {overall_real_avg}")
+        print(f"\nOverall average real score: {np.mean(real_scores)}")
     if gen_scores:
-        overall_gen_avg = np.mean(gen_scores)
-        print(f"Overall average Inception Score for generated images: {overall_gen_avg}")
+        print(f"Overall average generated score: {np.mean(gen_scores)}")
 
 if __name__ == '__main__':
     main()
