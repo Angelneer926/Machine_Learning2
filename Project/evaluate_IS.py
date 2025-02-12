@@ -82,6 +82,7 @@ def main():
         print(f"\nEvaluating IS for: {c}")
         real_is, gen_is = evaluate_category(c, orig_dir, gen_dir)
         results[c] = {'real': real_is, 'generated': gen_is}
+        print(f'Category: {c}')
         print(f"  Real images Inception Score: {real_is}")
         print(f"  Generated image Inception Score: {gen_is}")
 
