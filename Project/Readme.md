@@ -52,7 +52,16 @@ time python defusion_train.py
 - The **`results/`** directory contains trained **DDPM models** for each subtype.
 - The **`generated_images/`** directory stores the **generated images** for each subtype.
 
+## 5. Inception Scores for Real and Generated Images
+- The results are stored in the **`evaluation_results_IS/`** directory.
+- The evaluate_IS.py computes inception scores(IS) for both real and generated images for each category, given that the base directories are set correctly in the code. (We could not upload datasets on Github because the size was too big.)
+
+```
+python evaluate_IS.py
+```
+
 ```bash
 results/            # Directory containing trained DDPM models
 generated_images/   # Directory containing generated images for each subtype
+evaluation_results_IS/ # Directory containing the Inception Score results for real and generated images for all categories
 ```
