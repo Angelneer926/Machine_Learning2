@@ -57,8 +57,6 @@ time python defusion_train.py
 ```
 python evaluate_IS.py
 ```
-
-
 ## 5. Combine Patches
 ```
 patch python combine.py
