@@ -96,7 +96,7 @@ for category in categories:
     diffusion.to(device)  # Move model to GPU
 
     os.makedirs(f'./improved_generated_images/{category}', exist_ok=True)
-    num_images = 100
+    num_images = 200
     batch_size = 4
     for i in range(0, num_images, batch_size): 
         current_batch_size = min(batch_size, num_images - i)
@@ -108,3 +108,4 @@ for category in categories:
             print(f"Generated images saved to {save_path}")
 
     
+ 
