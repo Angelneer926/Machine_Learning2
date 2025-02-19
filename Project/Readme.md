@@ -81,6 +81,7 @@ CUDA_VISIBLE_DEVICES=0 python extract_features_fp.py --data_h5_dir RESULTS_DIREC
 ## 7. Training Splits
 
 ```
+python get_labelcsv.py
 python create_splits_seq.py --task task_1_tumor_subtyping_5_classes --seed 1 --k 10
 ```
 
