@@ -52,6 +52,7 @@ time python defusion_train.py
 - The Inceptions Scores(IS) are the evaluation metric for the quality of the generated images because higher IS indicates that the classification are more confident and the image dataset is diverse. 
 - We compare the IS of the generated images and real images. We aim to generate images such that the IS of the generated and real images are similar.
 - For the **Code & Graphs Milestone I**, we computed IS for all real images and 1,000 generated images across all categories.
+- For the **Code & Graphs Milestone II**, We computed IS for all real images, 1,000 generated images  across all categories, and 200 generated images with finetuning for the minority classes: LGSC and MC.
 - The evaluate_IS.py computes inception scores(IS) for both real and generated images for each category, given that the base directories are set correctly in the code. (We could not upload datasets on Github because the size was too big.)
 
 ```
