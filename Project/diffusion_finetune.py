@@ -5,7 +5,7 @@ from torchvision.utils import save_image
 from inspect import signature
 #print(signature(GaussianDiffusion.__init__))
 #categories = ["CC", "EC", "HGSC", "LGSC", "MC"]
-categories = ["EC"]
+categories = ["MC"]
 
 
 import sys
@@ -76,7 +76,7 @@ for category in categories:
     #trainer.load(category)
         
     #trainer.load(category)
-    trainer.load('improved_model_EC')
+    trainer.load(f'improved_model_{category}')
 
     trainer.train()
 
