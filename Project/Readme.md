@@ -4,7 +4,7 @@ This repository provides a pipeline for preprocessing whole slide images (WSIs),
 
 ## **1. Virtual Environment Setup**
 
-Before running the scripts, set up the required Conda environment:
+Before running the scripts, Conda environment setup is required:
 
 ```bash
 conda env create -f env.yml
