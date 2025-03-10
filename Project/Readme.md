@@ -1,4 +1,4 @@
-# **WSI Patch Generation and DDPM Training**
+ # **WSI Patch Generation and DDPM Training**
 
 This repository provides a pipeline for preprocessing whole slide images (WSIs), extracting patches, and training a **Denoising Diffusion Probabilistic Model (DDPM)** to generate synthetic histopathological image patches.
 
@@ -61,7 +61,14 @@ python evaluate_IS.py
 ```
 ## 5. Combine Patches
 ```
-patch python combine.py
+python combine.py
+```
+To optimize the random selection of generated patches for combination, a CNN model is used to predict the positional information of DDPM-generated patches and guide the combination process:
+
+```
+python CNN.py
+python position_decode.py
+python combine2.py
 ```
 ## 6. Feature Extraction
 
@@ -95,9 +102,15 @@ CUDA_VISIBLE_DEVICES=0 python main.py --drop_out 0.25 --early_stopping --lr 2e-4
 ## 9. Model and Output Storage
 - The **`results/`** directory contains trained **DDPM models** for each subtype.
 - The **`generated_images/`** directory stores the **generated images** for each subtype.
+- The **`evaluation_results_IS/`** directory stores quantitative results for DDPM-generated data.
+- The **`classify_results/`** directory stores classification results for baseline random combinations and position-based combinations.
 
 ```bash
 results/            # Directory containing trained DDPM models
 generated_images/   # Directory containing generated images for each subtype
 evaluation_results_IS/ # Directory containing the Inception Score results for real and generated images for all categories
+classify_results/  # Directory containing classification results
 ```
+
+## 10. Additional Notes
+The modules wsi_core, presets, models are based on the CLAM model, originally sourced from the GitHub repository [https://github.com/mahmoodlab/CLAM/tree/master](https://github.com/mahmoodlab/CLAM/tree/master).
